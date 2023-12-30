@@ -99,6 +99,16 @@ func main() {
                     sourceLang := context.String("source-lang")
                     targetLang := context.String("target-lang")
                     text := context.String("text")
+                    if context.NArg() > 0 {
+                        filePath := context.Args().Get(0)
+
+                        fileBytes, err := os.ReadFile(filePath)
+                        if err != nil {
+                            return nil
+                        }
+
+                        text = string(fileBytes)
+                    }
                     return translate(apiUrl, model, sourceLang, targetLang, text)
                 },
             },
