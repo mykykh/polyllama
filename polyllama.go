@@ -12,7 +12,6 @@ import (
 )
 
 const apiUrl = "http://localhost:11434/api"
-const model = "mistral"
 
 type GenerationRequest struct {
     Model       string
@@ -69,8 +68,38 @@ func main() {
                 Name: "translate",
                 Aliases: []string{"t"},
                 Usage: "translate text from one language to another",
+                Flags: []cli.Flag{
+                    &cli.StringFlag{
+                        Name: "source-lang",
+                        Value: "english",
+                        Aliases: []string{"sl"},
+                        Usage: "language of source text",
+                    },
+                    &cli.StringFlag{
+                        Name: "target-lang",
+                        Value: "english",
+                        Aliases: []string{"tl"},
+                        Usage: "language to which translate",
+                    },
+                    &cli.StringFlag{
+                        Name: "text",
+                        Value: "Hello world!",
+                        Aliases: []string{"t"},
+                        Usage: "text to translate",
+                    },
+                    &cli.StringFlag{
+                        Name: "model",
+                        Value: "mistral",
+                        Aliases: []string{"m"},
+                        Usage: "model to use for translation",
+                    },
+                },
                 Action: func(context *cli.Context) error {
-                    return translate(apiUrl, model, "english", "french", "Hello world!")
+                    model := context.String("model")
+                    sourceLang := context.String("source-lang")
+                    targetLang := context.String("target-lang")
+                    text := context.String("text")
+                    return translate(apiUrl, model, sourceLang, targetLang, text)
                 },
             },
         },
