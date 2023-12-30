@@ -4,8 +4,10 @@ import (
     "os"
     "fmt"
     "log"
+    "time"
     "bytes"
     "bufio"
+    "os/exec"
     "net/http"
     "encoding/json"
     "github.com/urfave/cli/v2"
@@ -62,6 +64,16 @@ func translate(apiUrl, model, sourceLang string, targetLang string, text string)
 }
 
 func main() {
+    // launch ollama server
+    ollama := exec.Command("ollama", "serve")
+    if err := ollama.Start(); err != nil {
+        log.Fatal(err)
+        fmt.Fprintln(os.Stderr, "Failed to launch ollama server")
+    }
+
+    // wait for 100 millisenconds so server started
+    time.Sleep(100 * time.Millisecond)
+
     app := cli.App{
         Commands: []*cli.Command{
             {
@@ -114,7 +126,12 @@ func main() {
             },
         },
     }
+
     if err := app.Run(os.Args); err != nil {
+        log.Fatal(err)
+    }
+
+    if err := ollama.Process.Kill(); err != nil {
         log.Fatal(err)
     }
 }
